@@ -1,0 +1,98 @@
+<!-- compare.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparison Results</title>
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            inline-size: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: start;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Comparison Results</h1>
+
+{% if matching_rows %}
+    <table>
+        <thead>
+            <tr>
+                <th>protocol_type</th>
+                <th>service</th>
+                <th>dst_bytes</th>
+                <th>flag</th>
+                <th>src_bytes</th>
+                <th>urgent</th>
+                <th>wrong_fragment</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in matching_rows %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td>{{ row[6] }}</td>
+                    <td>{{ row[7] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Chart.js Bar Chart -->
+    <canvas id="comparisonChart" width="400" height="200"></canvas>
+    <script>
+        var protocolTypes = {{ protocol_types|tojson }};
+        var protocolCounts = {{ protocol_counts|tojson }};
+
+        var ctx = document.getElementById('comparisonChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: protocolTypes,
+                datasets: [{
+                    label: 'Count of Matching Rows',
+                    data: protocolCounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderinline-size: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+{% else %}
+    <p>No matching rows found.</p>
+{% endif %}
+<form action="/drop-table" method="post">
+    <button type="submit">Reset Data</button>
+</form>
+</body>
+</html>
